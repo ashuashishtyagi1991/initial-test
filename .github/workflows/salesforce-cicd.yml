@@ -1,0 +1,35 @@
+name: Salesforce CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  salesforce-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Example: Install Salesforce CLI
+      - name: Install Salesforce CLI
+        run: |
+          npm install --global sfdx-cli
+
+      # Example: Authorize Salesforce Org (replace with your actual authentication mechanism)
+      - name: Authorize org
+        run: sfdx auth:web:login --setalias myOrg --instanceurl https://login.salesforce.com
+
+      # Example: Deploy to Salesforce (replace with your actual deployment command)
+      - name: Deploy metadata
+        run: sfdx force:source:deploy -p force-app --targetusername myOrg
+
+      # Example: Run tests (customize as needed)
+      - name: Run Apex tests
+        run: sfdx force:apex:test:run --resultformat human --wait 10 --targetusername myOrg
