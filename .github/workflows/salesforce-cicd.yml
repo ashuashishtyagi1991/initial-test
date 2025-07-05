@@ -1,0 +1,38 @@
+name: Salesforce CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  salesforce-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Example: Install Salesforce CLI
+      - name: Install Salesforce CLI
+        run: |
+          npm install --global sfdx-cli
+
+      - name: Authenticate with Salesforce
+        env:
+          SFDX_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          echo "$SFDX_URL" > ./authurl.txt
+          sfdx auth:sfdxurl:store -f ./authurl.txt -a targetOrg
+          rm -f ./authurl.txt
+          
+      - name: Run Apex tests
+        run: sfdx force:apex:test:run -c -r human -d ./tests/apex -w 20
+        
+      - name: Deploy to target org
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: sfdx force:source:deploy -p force-app/main/default -u targetOrg
