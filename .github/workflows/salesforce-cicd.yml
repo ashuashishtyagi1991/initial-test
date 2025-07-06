@@ -27,7 +27,7 @@ jobs:
           SFDX_URL: ${{ secrets.SFDX_AUTH_URL }}
         run: |
           echo "$SFDX_URL" > ./authurl.txt
-          sfdx auth:sfdxurl:store -f ./authurl.txt -a targetOrg
+          sfdx auth:sfdxurl:store -f ./authurl.txt -a trailhead1
           rm -f ./authurl.txt
           
       - name: Run Apex tests
@@ -35,4 +35,4 @@ jobs:
         
       - name: Deploy to target org
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: sfdx force:source:deploy -p force-app/main/default -u targetOrg
+        run: sfdx force:source:deploy -p force-app/main/default -u trailhead1
