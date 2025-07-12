@@ -2,13 +2,9 @@ name: Salesforce CI/CD
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main, master]
   pull_request:
-    branches:
-      - main
-      - master
+    branches: [main, master]
 
 jobs:
   salesforce-deploy:
@@ -17,23 +13,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Example: Install Salesforce CLI
-      - name: Install Salesforce CLI
+      - name: Install Salesforce CLI (full)
         run: |
-          npm install --global sfdx-cli
+          curl -sL https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-x64.tar.xz | tar xJf -
+          ./sfdx/install
+          echo "$PWD/sfdx/$(ls ./sfdx)/bin" >> $GITHUB_PATH
 
       - name: Authenticate with Salesforce
         env:
           SFDX_URL: ${{ secrets.SFDX_AUTH_URL }}
         run: |
           echo "$SFDX_URL" > ./authurl.txt
-          sfdx auth:sfdxurl:store -f ./authurl.txt -a trailhead1
-          rm -f ./authurl.txt
-          sfdx force:org:list  # ✅ Optional debug step
-          
+          sfdx force:auth:sfdxurl:store -f ./authurl.txt -a trailhead1
+          rm ./authurl.txt
+          sfdx force:org:list
+
       - name: Run Apex tests
         run: sfdx force:apex:test:run -c -r human -d ./tests/apex -w 20 -u trailhead1
-        
+
       - name: Deploy to target org
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: sfdx force:source:deploy -p force-app/main/default -u trailhead1
