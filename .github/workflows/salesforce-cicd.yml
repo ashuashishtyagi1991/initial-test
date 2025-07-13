@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-      - master
+      - featurebranch 
   pull_request:
     branches:
       - main
-      - master
+      - featurebranch
 
 jobs:
   salesforce-deploy:
