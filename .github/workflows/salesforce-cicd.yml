@@ -2,9 +2,9 @@ name: Salesforce CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, featurebranch]
   pull_request:
-    branches: [main]
+    branches: [main, featurebranch]
 
 jobs:
   salesforce-deploy:
@@ -12,6 +12,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: PMD - Salesforce APEX code analyzer action
+        uses: legetz/setup-pmd@7.1.0
+
+      - name: Run PMD Code Quality Check
+        run: |
+          pmd check \
+          --dir force-app/main/default/classes \
+          --rulesets .pmd/apex-ruleset.xml \
+          --format text
 
       - name: Install Salesforce CLI (official)
         run: |
@@ -32,4 +42,3 @@ jobs:
       - name: Deploy to Target Org
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: sf project deploy start --source-dir force-app/main/default --target-org trailhead1 --wait 10
-
