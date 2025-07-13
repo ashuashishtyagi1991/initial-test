@@ -2,7 +2,7 @@
 private class InvocableTest {
 
     @isTest
-    static void testGetPrompt() {
+    static void  testGetPrompt() {
         // Arrange: create mock Contact
         Contact testContact = new Contact(
             FirstName = 'Test',
