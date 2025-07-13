@@ -10,7 +10,9 @@ private class InvocableTest {
             Email = 'test@example.com'
         );
         insert testContact;
-
+        RawJSON j = new RawJSON();
+        string out = RawJSON.Myjson();
+    
         // Arrange: create mock User
         Profile p = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User testUser = new User(
@@ -54,5 +56,31 @@ private class InvocableTest {
         System.assertEquals(1, responses.size());
         System.assertNotEquals(null, responses[0].prompt);
         System.debug('Prompt JSON: ' + responses[0].prompt);
+    }
+    @isTest
+    static void testGenerateJSONContent() {
+        // Arrange: create sample Product2 record
+        Product2 p = new Product2(
+            Name = 'Sample Product',
+            Description = 'A product description',
+            IsActive = true
+        );
+        insert p;
+
+        // Arrange: build input map
+        Map<String, List<SObject>> mapOfRecords = new Map<String, List<SObject>>();
+        mapOfRecords.put('Programs', new List<SObject>{p});
+
+        // Act: call the method
+        Test.startTest();
+        String jsonResult = JSONGenerator.generateJSONContent(mapOfRecords);
+        Test.stopTest();
+
+        // Assert: ensure valid non-empty JSON is returned
+        System.debug('Generated JSON: ' + jsonResult);
+        System.assertNotEquals(null, jsonResult, 'JSON result should not be null');
+        System.assert(jsonResult.contains('"Name"'), 'JSON should contain the Name field');
+        System.assert(jsonResult.contains('Sample Product'), 'JSON should include Product Name value');
+        System.assert(jsonResult.startsWith('{') && jsonResult.endsWith('}'), 'JSON should be properly wrapped');
     }
 }
