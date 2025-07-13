@@ -2,9 +2,9 @@ name: Salesforce CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, featurebranch]
   pull_request:
-    branches: [main]
+    branches: [main, featurebranch]
 
 jobs:
   salesforce-deploy:
