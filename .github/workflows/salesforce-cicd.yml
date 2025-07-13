@@ -2,13 +2,9 @@ name: Salesforce CI/CD
 
 on:
   push:
-    branches:
-      - main
-      - featurebranch 
+    branches: [main, featurebranch]
   pull_request:
-    branches:
-      - main
-      - featurebranch
+    branches: [main, featurebranch]
 
 jobs:
   salesforce-deploy:
@@ -16,23 +12,33 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: PMD - Salesforce APEX code analyzer action
+        uses: legetz/setup-pmd@7.1.0
 
-      # Example: Install Salesforce CLI
-      - name: Install Salesforce CLI
+      - name: Run PMD Code Quality Check
         run: |
-          npm install --global sfdx-cli
+          pmd check \
+          --dir force-app/main/default/classes \
+          --rulesets .pmd/apex-ruleset.xml \
+          --format text
+
+      - name: Install Salesforce CLI (official)
+        run: |
+          npm install --global @salesforce/cli
 
       - name: Authenticate with Salesforce
         env:
           SFDX_URL: ${{ secrets.SFDX_AUTH_URL }}
         run: |
-          echo "$SFDX_URL" > ./authurl.txt
-          sfdx auth:sfdxurl:store -f ./authurl.txt -a targetOrg
-          rm -f ./authurl.txt
-          
+          echo "$SFDX_URL" > authurl.txt
+          sfdx force:auth:sfdxurl:store -f authurl.txt -a trailhead1
+          rm authurl.txt
+          sfdx force:org:list
+
       - name: Run Apex tests
-        run: sfdx force:apex:test:run -c -r human -d ./tests/apex -w 20
-        
-      - name: Deploy to target org
+        run: sfdx force:apex:test:run -c -r human -d ./tests/apex -w 20 -u trailhead1
+
+      - name: Deploy to Target Org
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: sfdx force:source:deploy -p force-app/main/default -u targetOrg
+        run: sf project deploy start --source-dir force-app/main/default --target-org trailhead1 --wait 10
