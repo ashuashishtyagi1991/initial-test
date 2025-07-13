@@ -2,7 +2,7 @@
 private class InvocableTest {
 
     @isTest
-    static void testGetPrompt() {
+    static void  testGetPrompt() {
         // Arrange: create mock Contact
         Contact testContact = new Contact(
             FirstName = 'Test',
@@ -13,7 +13,7 @@ private class InvocableTest {
         RawJSON j = new RawJSON();
         string out = RawJSON.Myjson();
     
-        // Arrange: create mock User
+        // Arrange: create mock User 
         Profile p = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User testUser = new User(
             FirstName = 'Test',
