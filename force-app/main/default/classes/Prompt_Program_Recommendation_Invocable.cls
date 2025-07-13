@@ -9,7 +9,7 @@ public class Prompt_Program_Recommendation_Invocable {
         Request input = requests[0];
         List<Response> responses = new List<Response>();
         Response output = new Response();
-        List<Product2> l istProduct = [Select Name,Description,Target_Clients__c from Product2];
+        List<Product2> listProduct = [Select Name,Description,Target_Clients__c from Product2];
         Map<string,list<sobject>> mapOfRecords = new Map<string,list<sobject>>{'Programs'=>listProduct};
         String myJSON = JSONGenerator.generateJSONContent(mapOfRecords);
         //String myJSON = JSON.serialize(mapOfRecords);
