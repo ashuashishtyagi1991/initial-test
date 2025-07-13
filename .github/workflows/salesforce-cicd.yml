@@ -12,18 +12,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      
       - name: PMD - Salesforce APEX code analyzer action
         uses: legetz/setup-pmd@7.1.0
 
       - name: Run PMD Code Quality Check
         run: |
-          pmd -d force-app/main/default/classes \
-              -R .pmd/apex-ruleset.xml \
-              -f text
-          
+          pmd check \
+          --dir force-app/main/default/classes \
+          --rulesets .pmd/apex-ruleset.xml \
+          --format text
+
       - name: Install Salesforce CLI (official)
         run: |
           npm install --global @salesforce/cli
