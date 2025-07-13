@@ -32,4 +32,3 @@ jobs:
       - name: Deploy to Target Org
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: sf project deploy start --source-dir force-app/main/default --target-org trailhead1 --wait 10
-
